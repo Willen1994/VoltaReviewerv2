@@ -1,132 +1,767 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hu">
 <head>
-    <meta charset="UTF-8">
-    <title>E-learning Test: CO-DI-1063</title>
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; background: #f9f9f9; color: #333; }
-        .question-card { background: #fff; border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; border-radius: 5px; }
-        .question-title { font-weight: bold; margin-bottom: 10px; }
-        .options { list-style-type: none; padding: 0; }
-        .options li { margin-bottom: 8px; }
-        .correct { font-weight: bold; color: #0056b3; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CO-DI-1063 - Teszt / Test</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  :root {
+    --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    --card-bg: rgba(30, 41, 59, 0.85);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --option-bg: rgba(15, 23, 42, 0.6);
+    --option-hover: rgba(51, 65, 85, 0.8);
+    --option-selected: rgba(59, 130, 246, 0.2);
+    --option-selected-border: #3b82f6;
+    --correct-bg: rgba(16, 185, 129, 0.2);
+    --correct-border: #10b981;
+    --wrong-bg: rgba(239, 68, 68, 0.2);
+    --wrong-border: #ef4444;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-gradient);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px;
+    overflow-x: hidden;
+  }
+
+  #fireworksCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  .quiz-container {
+    width: 100%;
+    max-width: 820px;
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    padding: 36px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+  }
+
+  .header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .header p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  .progress-wrapper {
+    margin-bottom: 28px;
+  }
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .progress-bar-bg {
+    width: 100%;
+    height: 8px;
+    background: rgba(15, 23, 42, 0.8);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #3b82f6, #06b6d4);
+    border-radius: 999px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .question-card {
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    transition: transform 0.2s ease, border-color 0.3s ease;
+  }
+
+  .question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .q-number {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #60a5fa;
+  }
+
+  .q-type-tag {
+    font-size: 0.75rem;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-muted);
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+
+  .question-text {
+    font-size: 1.05rem;
+    line-height: 1.55;
+    font-weight: 600;
+    margin-bottom: 18px;
+    color: #f1f5f9;
+  }
+
+  .question-text span.en {
+    display: block;
+    font-weight: 400;
+    color: #cbd5e1;
+    font-size: 0.95rem;
+    margin-top: 6px;
+  }
+
+  .options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .option-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 18px;
+    background: var(--option-bg);
+    border: 1.5px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1.5;
+    font-size: 0.95rem;
+  }
+
+  .option-label:hover {
+    background: var(--option-hover);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .option-label.selected {
+    background: var(--option-selected);
+    border-color: var(--option-selected-border);
+  }
+
+  .option-label.correct-ans {
+    background: var(--correct-bg) !important;
+    border-color: var(--correct-border) !important;
+  }
+
+  .option-label.wrong-ans {
+    background: var(--wrong-bg) !important;
+    border-color: var(--wrong-border) !important;
+  }
+
+  .option-label input {
+    appearance: none;
+    -webkit-appearance: none;
+    min-width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    border: 2px solid #64748b;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+  }
+
+  .option-label input[type="radio"] {
+    border-radius: 50%;
+  }
+
+  .option-label input[type="checkbox"] {
+    border-radius: 6px;
+  }
+
+  .option-label input:checked {
+    background: var(--primary);
+    border-color: var(--primary);
+  }
+
+  .option-label input:checked::after {
+    content: '✓';
+    position: absolute;
+    color: white;
+    font-size: 13px;
+    font-weight: bold;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  .btn {
+    padding: 14px 36px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.5);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 25px -5px rgba(37, 99, 235, 0.65);
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    display: none;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  /* Result Modal / Banner */
+  .result-box {
+    display: none;
+    text-align: center;
+    padding: 28px;
+    margin-bottom: 28px;
+    border-radius: 16px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    animation: fadeIn 0.5s ease;
+  }
+
+  .result-box.perfect {
+    border-color: #10b981;
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.25);
+  }
+
+  .score-circle {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    margin: 0 auto 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(59, 130, 246, 0.15);
+    border: 4px solid #3b82f6;
+  }
+
+  .result-box.perfect .score-circle {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: #10b981;
+  }
+
+  .score-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+
+  .score-percent {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .result-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .result-subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 600px) {
+    .quiz-container {
+      padding: 22px 16px;
+    }
+    .header h1 {
+      font-size: 1.4rem;
+    }
+  }
+</style>
 </head>
 <body>
 
-    <h1>CO-DI-1063 - v1 2026.09.30 > Teszt / Test</h1>
+<canvas id="fireworksCanvas"></canvas>
 
-    <!-- Question 1 -->
-    <div class="question-card">
-        <div class="question-title">1. QUESTION</div>
-        <p>Hol található meg az adott sor Level tank RO víz beengedő szelepéhez tartozó LOTO lakat kulcsa? / Where can the key for the LOTO padlock associated with the RO water inlet valve for the given group be found?</p>
-        <ul class="options">
-            <li><label class="correct"><input type="checkbox" checked disabled> Dissolving műszakvezetői irodában a PH2-es gyáregységben / In the Dissolving Shift leader's office in the PH2 production unit.</label>[span_0](start_span)[span_0](end_span)</li>
-            <li><label><input type="checkbox" disabled> A lakatban van hagyva / It is left inside the padlock</label>[span_1](start_span)[span_1](end_span)</li>
-            <li><label><input type="checkbox" disabled> A karbantartó műhelyben / In the maintenance workshop</label>[span_2](start_span)[span_2](end_span)</li>
-        </ul>
+<div class="quiz-container">
+  <div class="header">
+    <span class="badge">E-LEARNING • CO-DI-1063 - v1</span>
+    <h1>CO-DI-1063 - Teszt / Test</h1>
+    <p>Dissolving & LOTO Szelepellenőrzés / Valve Inspection Quiz</p>
+  </div>
+
+  <div id="resultBox" class="result-box">
+    <div class="score-circle">
+      <div class="score-value" id="scoreText">0 / 10</div>
+      <div class="score-percent" id="percentText">0%</div>
     </div>
+    <div class="result-title" id="resultTitle">Eredmény / Result</div>
+    <div class="result-subtitle" id="resultSubtitle"></div>
+  </div>
 
-    <!-- Question 2 -->
-    <div class="question-card">
-        <div class="question-title">2. QUESTION</div>
-        <p>Hol található a Level tank RO víz beengedő szelepe? / Where is the RO water inlet valve for the Level tank located?</p>
-        <ul class="options">
-            <li><label><input type="radio" disabled> PH1-ben és PH2-ben is a Level tank alján van a szelep / In both PH1 and PH2, the valve is located at the bottom of the Level tank</label>[span_3](start_span)[span_3](end_span)</li>
-            <li><label class="correct"><input type="radio" checked disabled> PH1-ben a szelep a tartály tetején. PH2-őn a szelep a tartály oldalánál helyezkedik el / In PH1, the valve is on top of the tank; in PH2, the valve is located on the side of the tank</label>[span_4](start_span)[span_4](end_span)</li>
-            <li><label><input type="radio" disabled> A Dissolvingon nincs RO víz beadagoló szelep a Level tank-okra telepítve, mert a WT/WWT terület feladata az RO víz beadagolása / There is no RO water inlet valve installed on the Level tanks in the Dissolving area, as the supply of RO water is the responsibility of the WT/WWT (Water Treatment/Wastewater Treatment) department</label>[span_5](start_span)[span_5](end_span)</li>
-        </ul>
+  <div class="progress-wrapper">
+    <div class="progress-info">
+      <span id="answeredCount">Megválaszolva / Answered: 0 / 10</span>
+      <span id="progressPercent">0%</span>
     </div>
-
-    <!-- Question 3 -->
-    <div class="question-card">
-        <div class="question-title">3. QUESTION</div>
-        <p>A Level tank RO víz töltő szelepen nincs LOTO lakat, de a szelep zártnak látszik. Mit kell tenni? / There is no LOTO padlock on the Level tank's RO water inlet valve, but the valve appears to be closed. What should be done?</p>
-        <ul class="options">
-            <li><label><input type="radio" disabled> Figyelmen kívűl kell hagyni, majd valaki úgy is megoldja / Ignore it; someone else will take care of it eventually</label>[span_6](start_span)[span_6](end_span)</li>
-            <li><label class="correct"><input type="radio" checked disabled> Ellenőrizni kell a szelepet, hogy valóban zárva van-e, amennyiben a szelep nincs zárva vagy csak részlegesen van zárva, akkor azt el kell zárni. Jelezni kell a műszakvezetőnek a LOTO lakat hiányát / Check whether the valve is truly closed; if it is not closed—or only partially closed—it must be shut. Report the absence of the LOTO padlock to the Shiftleader</label>[span_7](start_span)[span_7](end_span)</li>
-            <li><label><input type="radio" disabled> Ellenőrizni kell a szelepet, hogy valóban zárva van-e, amennyiben a szelep nincs zárva vagy csak részlegesen van zárva, akkor azt teljesen ki kell nyitni és jelezni kell a műszakvezetőnek a LOTO lakat hiányát / Check whether the valve is truly closed; if it is not closed—or only partially closed—it must be opened completely, and the absence of the LOTO padlock must be reported to the shift supervisor</label>[span_8](start_span)[span_8](end_span)</li>
-        </ul>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBar"></div>
     </div>
+  </div>
 
-    <!-- Question 4 -->
-    <div class="question-card">
-        <div class="question-title">4. QUESTION</div>
-        <p>Hol található a plater gépek és csőszakaszainak vizes mosóinak szelepe? / Where is the valve for the water-based flushing of the plater machines and their associated pipe sections located?</p>
-        <ul class="options">
-            <li><label><input type="radio" disabled> PH1-en a szelep közvetlenül a Plater pumpa előtt található meg, az első emeleten. PH2-őn a szelep közvetlenül a Head Tank után található meg, a fölödszinten / On PH1, the valve is located directly before the Plater pump, on the first floor. On PH2, the valve is located directly after the Head Tank, on the ground floor</label>[span_9](start_span)[span_9](end_span)</li>
-            <li><label><input type="radio" disabled> PH1-en a szelep közvetlenül a Plater pumpa előtt található meg, a második emeleten. PH2-őn a szelep közvetlenül a Head Tank után található meg, az első emeleten / On PH1, the valve is located directly before the Plater pump, on the second floor. On PH2, the valve is located directly after the Head Tank, on the first floor</label>[span_10](start_span)[span_10](end_span)</li>
-            <li><label class="correct"><input type="radio" checked disabled> PH1-en a szelep közvetlenül a Plater pumpa előtt található meg, az első emeleten. PH2-őn a szelep közvetlenül a Head Tank után található meg, a második emeleten / On PH1, the valve is located directly before the Plater pump, on the first floor. On PH2, the valve is located directly after the Head Tank, on the second floor</label>[span_11](start_span)[span_11](end_span)</li>
-            <li><label><input type="radio" disabled> Nincsenek elzáró szelepek telepítve a csőszakaszokra, ugyanis a csőszakaszok mosását a WT/WWT terület végzi / There are no shut-off valves installed on the pipe sections, as the flushing of these sections is handled by the WT/WWT area</label>[span_12](start_span)[span_12](end_span)</li>
-        </ul>
+  <form id="quizForm">
+    <div id="questionsContainer"></div>
+
+    <div class="actions">
+      <button type="submit" class="btn btn-primary" id="submitBtn">SUBMIT / BEKÜLDÉS</button>
+      <button type="button" class="btn btn-secondary" id="resetBtn" onclick="resetQuiz()">ÚJRATÖLTÉS / RETRY</button>
     </div>
+  </form>
+</div>
 
-    <!-- Question 5 -->
-    <div class="question-card">
-        <div class="question-title">5. QUESTION</div>
-        <p>A plater gépek és csőszakaszainak vizes mosóinak szelepe mikor van zárt állapotban? / When is the valve for the water-based flushing of the plater machines and their associated pipe sections in the closed position?</p>
-        <ul class="options">
-            <li><label class="correct"><input type="checkbox" checked disabled> A szelep akkor van zárt állapotban, ha annak záró karját a nulla pozícióra mozgatom (skáláról leolvasott érték). Állását tekintve a szelep záró karja merőleges a csövezésre / The valve is in the closed position when its operating handle is moved to the zero position (as read from the scale). In this state, the valve handle is perpendicular to the piping</label>[span_13](start_span)[span_13](end_span)</li>
-            <li><label><input type="checkbox" disabled> A szelepeket nem lehet elzárni / The valves cannot be closed</label>[span_14](start_span)[span_14](end_span)</li>
-            <li><label><input type="checkbox" disabled> A szelep akkor van zárt állapotban, ha a skálán nagyobb érték, mint nulla olvasható le és a zárókar nem merőleges a csövezésre / The valve is in the closed position when the value read from the scale is greater than zero and the operating handle is not perpendicular to the piping</label>[span_15](start_span)[span_15](end_span)</li>
-        </ul>
-    </div>
+<script>
+  const quizData = [
+    {
+      id: 1,
+      type: "checkbox",
+      hu: "Hol található meg az adott sor Level tank RO víz beengedő szelepéhez tartozó LOTO lakat kulcsa?",
+      en: "Where can the key for the LOTO padlock associated with the RO water inlet valve for the given group be found?",
+      options: [
+        { text: "Dissolving műszakvezetői irodában a PH2-es gyáregységben / In the Dissolving Shift leader's office in the PH2 production unit.", correct: true },
+        { text: "A lakatban van hagyva / It is left inside the padlock", correct: false },
+        { text: "A karbantartó műhelyben / In the maintenance workshop", correct: false }
+      ]
+    },
+    {
+      id: 2,
+      type: "radio",
+      hu: "Hol található a Level tank RO víz beengedő szelepe?",
+      en: "Where is the RO water inlet valve for the Level tank located?",
+      options: [
+        { text: "PH1-ben és PH2-ben is a Level tank alján van a szelep / In both PH1 and PH2, the valve is located at the bottom of the Level tank", correct: false },
+        { text: "PH1-ben a szelep a tartály tetején. PH2-őn a szelep a tartály oldalánál helyezkedik el / In PH1, the valve is on top of the tank; in PH2, the valve is located on the side of the tank", correct: true },
+        { text: "A Dissolvingon nincs RO víz beadagoló szelep a Level tank-okra telepítve, mert a WT/WWT terület feladata az RO víz beadagolása / There is no RO water inlet valve installed on the Level tanks in the Dissolving area, as the supply of RO water is the responsibility of the WT/WWT (Water Treatment/Wastewater Treatment) department", correct: false }
+      ]
+    },
+    {
+      id: 3,
+      type: "radio",
+      hu: "A Level tank RO víz töltő szelepen nincs LOTO lakat, de a szelep zártnak látszik. Mit kell tenni?",
+      en: "There is no LOTO padlock on the Level tank's RO water inlet valve, but the valve appears to be closed. What should be done?",
+      options: [
+        { text: "Figyelmen kívűl kell hagyni, majd valaki úgy is megoldja / Ignore it; someone else will take care of it eventually", correct: false },
+        { text: "Ellenőrizni kell a szelepet, hogy valóban zárva van-e, amennyiben a szelep nincs zárva vagy csak részlegesen van zárva, akkor azt el kell zárni. Jelezni kell a műszakvezetőnek a LOTO lakat hiányát / Check whether the valve is truly closed; if it is not closed—or only partially closed—it must be shut. Report the absence of the LOTO padlock to the Shiftleader", correct: true },
+        { text: "Ellenőrizni kell a szelepet, hogy valóban zárva van-e, amennyiben a szelep nincs zárva vagy csak részlegesen van zárva, akkor azt teljesen ki kell nyitni és jelezni kell a műszakvezetőnek a LOTO lakat hiányát / Check whether the valve is truly closed; if it is not closed—or only partially closed—it must be opened completely, and the absence of the LOTO padlock must be reported to the shift supervisor", correct: false }
+      ]
+    },
+    {
+      id: 4,
+      type: "radio",
+      hu: "Hol található a plater gépek és csőszakaszainak vizes mosóinak szelepe?",
+      en: "Where is the valve for the water-based flushing of the plater machines and their associated pipe sections located?",
+      options: [
+        { text: "PH1-en a szelep közvetlenül a Plater pumpa előtt található meg, az első emeleten. PH2-őn a szelep közvetlenül a Head Tank után található meg, a fölödszinten / On PH1, the valve is located directly before the Plater pump, on the first floor. On PH2, the valve is located directly after the Head Tank, on the ground floor", correct: false },
+        { text: "PH1-en a szelep közvetlenül a Plater pumpa előtt található meg, a második emeleten. PH2-őn a szelep közvetlenül a Head Tank után található meg, az első emeleten / On PH1, the valve is located directly before the Plater pump, on the second floor. On PH2, the valve is located directly after the Head Tank, on the first floor", correct: false },
+        { text: "PH1-en a szelep közvetlenül a Plater pumpa előtt található meg, az első emeleten. PH2-őn a szelep közvetlenül a Head Tank után található meg, a második emeleten / On PH1, the valve is located directly before the Plater pump, on the first floor. On PH2, the valve is located directly after the Head Tank, on the second floor", correct: true },
+        { text: "Nincsenek elzáró szelepek telepítve a csőszakaszokra, ugyanis a csőszakaszok mosását a WT/WWT terület végzi / There are no shut-off valves installed on the pipe sections, as the flushing of these sections is handled by the WT/WWT area", correct: false }
+      ]
+    },
+    {
+      id: 5,
+      type: "checkbox",
+      hu: "A plater gépek és csőszakaszainak vizes mosóinak szelepe mikor van zárt állapotban?",
+      en: "When is the valve for the water-based flushing of the plater machines and their associated pipe sections in the closed position?",
+      options: [
+        { text: "A szelep akkor van zárt állapotban, ha annak záró karját a nulla pozícióra mozgatom (skáláról leolvasott érték). Állását tekintve a szelep záró karja merőleges a csövezésre / The valve is in the closed position when its operating handle is moved to the zero position (as read from the scale). In this state, the valve handle is perpendicular to the piping", correct: true },
+        { text: "A szelepeket nem lehet elzárni / The valves cannot be closed", correct: false },
+        { text: "A szelep akkor van zárt állapotban, ha a skálán nagyobb érték, mint nulla olvasható le és a zárókar nem merőleges a csövezésre / The valve is in the closed position when the value read from the scale is greater than zero and the operating handle is not perpendicular to the piping", correct: false }
+      ]
+    },
+    {
+      id: 6,
+      type: "radio",
+      hu: "ACF vizes mosó rendszer pumpa előtti szelep zárt állapotban van, ha ...",
+      en: "The valve located before the pump in the ACF water-based flushing system is in the closed position when...",
+      options: [
+        { text: "annak záró karját a nulla pozícióra mozgatom (skáláról leolvasott érték). Állását tekintve a szelep záró karja merőleges a csövezésre / its operating handle is moved to the zero position (as read from the scale). In terms of its position, the valve's shut-off lever is perpendicular to the piping", correct: true },
+        { text: "a skálán nagyobb érték, mint nulla olvasható le és a zárókar nem merőleges a csövezésre / a value greater than zero can be read on the scale, and the shut-off lever is not perpendicular to the piping", correct: false }
+      ]
+    },
+    {
+      id: 7,
+      type: "radio",
+      hu: "Az ACF vizes mosó rendszer elzáró szelepe hol található?",
+      en: "Where is the shut-off valve for the ACF water-washing system located?",
+      options: [
+        { text: "Minden sornak az ACF vizes mosó betáplálási pontja az ACF pumpája előtt található meg / The ACF water-washing feed point for each line is located upstream of its respective ACF pump", correct: true },
+        { text: "Az ACF vizes mosó rendszer nem rendelkezik szeleppel / The ACF water-washing system does not have a valve", correct: false },
+        { text: "Az ACF vizes mosó rendszert a WT/WWT részleg kezeli, így a szelep a WT/WWT területen található / The ACF water-washing system is managed by the WT/WWT department; therefore, the valve is located in the WT/WWT area", correct: false }
+      ]
+    },
+    {
+      id: 8,
+      type: "radio",
+      hu: "Okozhat szint emelkedést elektrolittal történő sor töltés a zárt rendszerben?",
+      en: "Can filling a line with electrolyte in a closed system cause a rise in level?",
+      options: [
+        { text: "Igen / Yes", correct: true },
+        { text: "Nem / No", correct: false }
+      ]
+    },
+    {
+      id: 9,
+      type: "checkbox",
+      hu: "Milyen NEM szándékos RO vizes töltés vagy mosós okozhat szintemelkedést? (Több jó válasz lehetséges)",
+      en: "What kind of UNINTENTIONAL RO water filling or washing can cause a rise in level? (Multiple correct answers are possible)",
+      options: [
+        { text: "Két vagy több sor keresztbe járatás után az egyik szelep nyitva maradt / One of the valves remained open after cross-operation between two or more lines", correct: true },
+        { text: "Sor szinttöltése másik sorból, aminek végezte után a töltésre használt szelep nyitva maradt / Filling a group from another group, where the valve used for the transfer remained open after the process was completed", correct: true },
+        { text: "Csak az RO vizes töltés és mosás képes szint emelkedést okozni / Only RO water filling and washing can cause a rise in level", correct: false },
+        { text: "A rendszerben nem lehet szint emelkedést elérni RO vizes töltés vagy mosás nélkül / It is impossible for the level to rise in the system without RO water filling or washing", correct: false }
+      ]
+    },
+    {
+      id: 10,
+      type: "checkbox",
+      hu: "Milyen védőfelszerelések használata kötelező, ha a Dissolving területen a szelepeket ellenőrizni kell és esetlegesen el kell zárni. (Több jó válasz lehetséges)",
+      en: "What personal protective equipment (PPE) is mandatory when valves in the Dissolving area need to be checked or potentially shut off? (Multiple correct answers are possible)",
+      options: [
+        { text: "Munkavédelmi cipő / Safety shoes", correct: true },
+        { text: "Fejvédő / Head protection (hard hat)", correct: true },
+        { text: "Arcvédő vagy védő szemüveg / Face shield or safety goggles", correct: true },
+        { text: "Védőkesztyű / Protective gloves", correct: true },
+        { text: "Semmilyen védőfelszerelésre nincs szükség a Dissolving területen / No protective equipment is required in the Dissolving area", correct: false }
+      ]
+    }
+  ];
 
-    <!-- Question 6 -->
-    <div class="question-card">
-        <div class="question-title">6. QUESTION</div>
-        <p>ACF vizes mosó rendszer pumpa előtti szelep zárt állapotban van, ha ... / The valve located before the pump in the ACF water-based flushing system is in the closed position when...</p>
-        <ul class="options">
-            <li><label class="correct"><input type="radio" checked disabled> annak záró karját a nulla pozícióra mozgatom (skáláról leolvasott érték). Állását tekintve a szelep záró karja merőleges a csövezésre / its operating handle is moved to the zero position (as read from the scale). In terms of its position, the valve's shut-off lever is perpendicular to the piping</label>[span_16](start_span)[span_16](end_span)</li>
-            <li><label><input type="radio" disabled> a skálán nagyobb érték, mint nulla olvasható le és a zárókar nem merőleges a csövezésre / a value greater than zero can be read on the scale, and the shut-off lever is not perpendicular to the piping</label>[span_17](start_span)[span_17](end_span)</li>
-        </ul>
-    </div>
+  const container = document.getElementById('questionsContainer');
+  let submitted = false;
 
-    <!-- Question 7 -->
-    <div class="question-card">
-        <div class="question-title">7. QUESTION</div>
-        <p>Az ACF vizes mosó rendszer elzáró szelepe hol található? / Where is the shut-off valve for the ACF water-washing system located?</p>
-        <ul class="options">
-            <li><label class="correct"><input type="radio" checked disabled> Minden sornak az ACF vizes mosó betáplálási pontja az ACF pumpája előtt található meg / The ACF water-washing feed point for each line is located upstream of its respective ACF pump</label>[span_18](start_span)[span_18](end_span)</li>
-            <li><label><input type="radio" disabled> Az ACF vizes mosó rendszer nem rendelkezik szeleppel / The ACF water-washing system does not have a valve</label>[span_19](start_span)[span_19](end_span)</li>
-            <li><label><input type="radio" disabled> Az ACF vizes mosó rendszert a WT/WWT részleg kezeli, így a szelep a WT/WWT területen található / The ACF water-washing system is managed by the WT/WWT department; therefore, the valve is located in the WT/WWT area</label>[span_20](start_span)[span_20](end_span)</li>
-        </ul>
-    </div>
+  function renderQuiz() {
+    container.innerHTML = '';
+    quizData.forEach((q, qIdx) => {
+      const card = document.createElement('div');
+      card.className = 'question-card';
+      card.id = `q-card-${qIdx}`;
 
-    <!-- Question 8 -->
-    <div class="question-card">
-        <div class="question-title">8. QUESTION</div>
-        <p>Okozhat szint emelkedést elektrolittal történő sor töltés a zárt rendszerben? / Can filling a line with electrolyte in a closed system cause a rise in level?</p>
-        <ul class="options">
-            <li><label class="correct"><input type="radio" checked disabled> Igen / Yes</label>[span_21](start_span)[span_21](end_span)</li>
-            <li><label><input type="radio" disabled> Nem / No</label>[span_22](start_span)[span_22](end_span)</li>
-        </ul>
-    </div>
+      const typeLabel = q.type === 'checkbox' ? 'Több választási lehetőség / Multiple choice' : 'Egy válasz / Single choice';
 
-    <!-- Question 9 -->
-    <div class="question-card">
-        <div class="question-title">9. QUESTION</div>
-        <p>Milyen NEM szándékos RO vizes töltés vagy mosós okozhat szintemelkedést? (Több jó válasz lehetséges) / What kind of UNINTENTIONAL RO water filling or washing can cause a rise in level? (Multiple correct answers are possible)</p>
-        <ul class="options">
-            <li><label class="correct"><input type="checkbox" checked disabled> Két vagy több sor keresztbe járatás után az egyik szelep nyitva maradt / One of the valves remained open after cross-operation between two or more lines</label>[span_23](start_span)[span_23](end_span)</li>
-            <li><label class="correct"><input type="checkbox" checked disabled> Sor szinttöltése másik sorból, aminek végezte után a töltésre használt szelep nyitva maradt / Filling a group from another group, where the valve used for the transfer remained open after the process was completed</label>[span_24](start_span)[span_24](end_span)</li>
-            <li><label><input type="checkbox" disabled> Csak az RO vizes töltés és mosás képes szint emelkedést okozni / Only RO water filling and washing can cause a rise in level</label>[span_25](start_span)[span_25](end_span)</li>
-            <li><label><input type="checkbox" disabled> A rendszerben nem lehet szint emelkedést elérni RO vizes töltés vagy mosás nélkül / It is impossible for the level to rise in the system without RO water filling or washing</label>[span_26](start_span)[span_26](end_span)</li>
-        </ul>
-    </div>
+      let optionsHTML = '';
+      q.options.forEach((opt, optIdx) => {
+        optionsHTML += `
+          <label class="option-label" id="label-${qIdx}-${optIdx}">
+            <input type="${q.type}" name="q${qIdx}" value="${optIdx}" onchange="handleSelection(${qIdx})">
+            <span>${opt.text}</span>
+          </label>
+        `;
+      });
 
-    <!-- Question 10 -->
-    <div class="question-card">
-        <div class="question-title">10. QUESTION</div>
-        <p>Milyen védőfelszerelések használata kötelező, ha a Dissolving területen a szelepeket ellenőrizni kell és esetlegesen el kell zárni. (Több jó válasz lehetséges) / What personal protective equipment (PPE) is mandatory when valves in the Dissolving area need to be checked or potentially shut off? (Multiple correct answers are possible)</p>
-        <ul class="options">
-            <li><label class="correct"><input type="checkbox" checked disabled> Munkavédelmi cipő / Safety shoes</label>[span_27](start_span)[span_27](end_span)</li>
-            <li><label class="correct"><input type="checkbox" checked disabled> Fejvédő / Head protection (hard hat)</label>[span_28](start_span)[span_28](end_span)</li>
-            <li><label class="correct"><input type="checkbox" checked disabled> Arcvédő vagy védő szemüveg / Face shield or safety goggles</label>[span_29](start_span)[span_29](end_span)</li>
-            <li><label class="correct"><input type="checkbox" checked disabled> Védőkesztyű / Protective gloves</label>[span_30](start_span)[span_30](end_span)</li>
-            <li><label><input type="checkbox" disabled> Semmilyen védőfelszerelésre nincs szükség a Dissolving területen / No protective equipment is required in the Dissolving area</label>[span_31](start_span)[span_31](end_span)</li>
-        </ul>
-    </div>
+      card.innerHTML = `
+        <div class="question-header">
+          <span class="q-number">${q.id}. QUESTION</span>
+          <span class="q-type-tag">${typeLabel}</span>
+        </div>
+        <div class="question-text">
+          ${q.hu}
+          <span class="en">${q.en}</span>
+        </div>
+        <div class="options-list">
+          ${optionsHTML}
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
 
+  function handleSelection(qIdx) {
+    if (submitted) return;
+    const inputs = document.querySelectorAll(`input[name="q${qIdx}"]`);
+    inputs.forEach((inp, idx) => {
+      const label = document.getElementById(`label-${qIdx}-${idx}`);
+      if (inp.checked) {
+        label.classList.add('selected');
+      } else {
+        label.classList.remove('selected');
+      }
+    });
+    updateProgress();
+  }
+
+  function updateProgress() {
+    let answered = 0;
+    quizData.forEach((q, qIdx) => {
+      const checked = document.querySelectorAll(`input[name="q${qIdx}"]:checked`);
+      if (checked.length > 0) answered++;
+    });
+    const pct = Math.round((answered / quizData.length) * 100);
+    document.getElementById('answeredCount').textContent = `Megválaszolva / Answered: ${answered} / ${quizData.length}`;
+    document.getElementById('progressPercent').textContent = `${pct}%`;
+    document.getElementById('progressBar').style.width = `${pct}%`;
+  }
+
+  document.getElementById('quizForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (submitted) return;
+    submitted = true;
+
+    let score = 0;
+
+    quizData.forEach((q, qIdx) => {
+      const inputs = document.querySelectorAll(`input[name="q${qIdx}"]`);
+      let isQuestionCorrect = true;
+
+      inputs.forEach((inp, optIdx) => {
+        inp.disabled = true;
+        const label = document.getElementById(`label-${qIdx}-${optIdx}`);
+        const isCorrectOption = q.options[optIdx].correct;
+
+        if (isCorrectOption) {
+          label.classList.add('correct-ans');
+        }
+        if (inp.checked && !isCorrectOption) {
+          label.classList.add('wrong-ans');
+          isQuestionCorrect = false;
+        }
+        if (!inp.checked && isCorrectOption) {
+          isQuestionCorrect = false;
+        }
+      });
+
+      if (isQuestionCorrect) {
+        score++;
+      }
+    });
+
+    const total = quizData.length;
+    const percentage = Math.round((score / total) * 100);
+    const resultBox = document.getElementById('resultBox');
+    document.getElementById('scoreText').textContent = `${score} / ${total}`;
+    document.getElementById('percentText').textContent = `${percentage}%`;
+
+    if (score === total) {
+      resultBox.classList.add('perfect');
+      document.getElementById('resultTitle').textContent = "🎉 TÖKÉLETES EREDMÉNY! / PERFECT SCORE! 🎉";
+      document.getElementById('resultSubtitle').textContent = "Gratulálunk, minden válasz hibátlan! / Congratulations, all answers are correct!";
+      startFireworks();
+    } else {
+      resultBox.classList.remove('perfect');
+      document.getElementById('resultTitle').textContent = "Teszt befejezve / Quiz Completed";
+      document.getElementById('resultSubtitle').textContent = "A zöld keret jelöli a helyes válaszokat. / Green borders indicate the correct answers.";
+    }
+
+    resultBox.style.display = 'block';
+    document.getElementById('submitBtn').style.display = 'none';
+    document.getElementById('resetBtn').style.display = 'inline-block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  function resetQuiz() {
+    submitted = false;
+    stopFireworks();
+    document.getElementById('resultBox').style.display = 'none';
+    document.getElementById('submitBtn').style.display = 'inline-block';
+    document.getElementById('resetBtn').style.display = 'none';
+    renderQuiz();
+    updateProgress();
+  }
+
+  // --- FIREWORKS ANIMATION ---
+  const canvas = document.getElementById('fireworksCanvas');
+  const ctx = canvas.getContext('2d');
+  let fireworks = [];
+  let particles = [];
+  let animFrameId = null;
+  let fireworkInterval = null;
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  class Firework {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = canvas.height;
+      this.targetY = Math.random() * (canvas.height * 0.45) + 50;
+      this.speed = Math.random() * 4 + 6;
+      this.hue = Math.floor(Math.random() * 360);
+    }
+    update() {
+      this.y -= this.speed;
+      if (this.y <= this.targetY) {
+        createParticles(this.x, this.y, this.hue);
+        return false;
+      }
+      return true;
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+      ctx.fillStyle = `hsl(${this.hue}, 100%, 65%)`;
+      ctx.fill();
+    }
+  }
+
+  class Particle {
+    constructor(x, y, hue) {
+      this.x = x;
+      this.y = y;
+      this.hue = hue + (Math.random() * 40 - 20);
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 6 + 1.5;
+      this.vx = Math.cos(angle) * speed;
+      this.vy = Math.sin(angle) * speed;
+      this.alpha = 1;
+      this.decay = Math.random() * 0.018 + 0.012;
+      this.gravity = 0.06;
+    }
+    update() {
+      this.vx *= 0.98;
+      this.vy *= 0.98;
+      this.vy += this.gravity;
+      this.x += this.vx;
+      this.y += this.vy;
+      this.alpha -= this.decay;
+      return this.alpha > 0;
+    }
+    draw() {
+      ctx.save();
+      ctx.globalAlpha = this.alpha;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = `hsl(${this.hue}, 100%, 60%)`;
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function createParticles(x, y, hue) {
+    for (let i = 0; i < 65; i++) {
+      particles.push(new Particle(x, y, hue));
+    }
+  }
+
+  function animateFireworks() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    fireworks = fireworks.filter(fw => {
+      fw.draw();
+      return fw.update();
+    });
+    particles = particles.filter(p => {
+      p.draw();
+      return p.update();
+    });
+    animFrameId = requestAnimationFrame(animateFireworks);
+  }
+
+  function startFireworks() {
+    if (animFrameId) return;
+    animateFireworks();
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => fireworks.push(new Firework()), i * 250);
+    }
+    fireworkInterval = setInterval(() => {
+      fireworks.push(new Firework());
+    }, 550);
+  }
+
+  function stopFireworks() {
+    clearInterval(fireworkInterval);
+    fireworkInterval = null;
+    cancelAnimationFrame(animFrameId);
+    animFrameId = null;
+    fireworks = [];
+    particles = [];
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  renderQuiz();
+</script>
 </body>
 </html>
